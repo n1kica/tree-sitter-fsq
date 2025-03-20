@@ -3126,7 +3126,10 @@ module.exports = grammar({
           prec.left(
             precedence,
             seq(
-              field("left", $._expression),
+              field(
+                "left",
+                choice(seq("{", $._expression, "}"), $._expression),
+              ),
               field("operator", operator),
               field("right", $._expression),
             ),
@@ -3139,7 +3142,10 @@ module.exports = grammar({
           prec.left(
             precedence,
             seq(
-              field("left", $._expression),
+              field(
+                "left",
+                choice(seq("{", $._expression, "}"), $._expression),
+              ),
               field("operator", operator),
               field("right", $._expression),
             ),
@@ -3152,7 +3158,10 @@ module.exports = grammar({
           prec.left(
             precedence,
             seq(
-              field("left", $._expression),
+              field(
+                "left",
+                choice(seq("{", $._expression, "}"), $._expression),
+              ),
               field("operator", operator),
               field("right", choice($.list, $.subquery)),
             ),
