@@ -904,7 +904,9 @@ module.exports = grammar({
         ),
         seq(
           field("value", choice($.all_fields, $._expression)),
-          optional($._alias),
+          optional(
+            choice($._alias, $.all_fields, alias($._qualified_field, $.field)),
+          ),
         ),
       ),
 
@@ -2825,7 +2827,8 @@ module.exports = grammar({
         choice($.identifier, $.window_specification),
       ),
 
-    _alias: ($) => seq(optional($.keyword_as), field("alias", $.identifier)),
+    _alias: ($) =>
+      prec(1, seq(optional($.keyword_as), field("alias", $.identifier))),
 
     from: ($) =>
       seq(
