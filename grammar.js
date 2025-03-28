@@ -363,6 +363,8 @@ module.exports = grammar({
     not_distinct_from: ($) =>
       seq($.keyword_is, $.keyword_not, $.keyword_distinct, $.keyword_from),
 
+    _access_operator: () => choice(".", ":"),
+    _arithmetic_operator: () => choice("+", "-"),
     _temporary: ($) => choice($.keyword_temp, $.keyword_temporary),
     _not_null: ($) => seq($.keyword_not, $.keyword_null),
     _primary_key: ($) => seq($.keyword_primary, $.keyword_key),
@@ -2093,14 +2095,14 @@ module.exports = grammar({
       choice(
         seq(
           field("database", $.identifier),
-          choice(".", ":"),
+          $._access_operator,
           field("schema", $.identifier),
-          choice(".", ":"),
+          $._access_operator,
           field("name", $.identifier),
         ),
         seq(
           field("schema", $.identifier),
-          choice(".", ":"),
+          $._access_operator,
           field("name", $.identifier),
         ),
         field("name", $.identifier),
@@ -2654,7 +2656,7 @@ module.exports = grammar({
     ordered_column: ($) => seq(field("name", $._column), optional($.direction)),
 
     all_fields: ($) =>
-      seq(optional(seq($.object_reference, choice(".", ":"))), "*"),
+      seq(optional(seq($.object_reference, $._access_operator)), "*"),
 
     parameter: ($) => /\?|(\$[0-9]+)/,
 
@@ -2693,7 +2695,7 @@ module.exports = grammar({
     _qualified_field: ($) =>
       seq(
         optional(
-          seq(optional_parenthesis($.object_reference), choice(".", ":")),
+          seq(optional_parenthesis($.object_reference), $._access_operator),
         ),
         field("name", $.identifier),
       ),
@@ -3232,12 +3234,12 @@ module.exports = grammar({
     _natural_number: (_) => /\d+/,
     _integer: ($) =>
       seq(
-        optional(choice("-", "+")),
+        optional($._arithmetic_operator),
         /(0[xX][0-9A-Fa-f]+(_[0-9A-Fa-f]+)*)|(0[oO][0-7]+(_[0-7]+)*)|(0[bB][01]+(_[01]+)*)|(\d+(_\d+)*(e[+-]?\d+(_\d+)*)?)/,
       ),
     _decimal_number: ($) =>
       seq(
-        optional(choice("-", "+")),
+        optional($._arithmetic_operator),
         /((\d+(_\d+)*)?[.]\d+(_\d+)*(e[+-]?\d+(_\d+)*)?)|(\d+(_\d+)*[.](e[+-]?\d+(_\d+)*)?)/,
       ),
     _bit_string: ($) => seq(/[bBxX]'([^']|'')*'/, repeat(/'([^']|'')*'/)),
