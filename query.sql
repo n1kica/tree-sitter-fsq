@@ -1,5 +1,5 @@
 SELECT
-  TOP(10) t.*
+  TOP(10) t.a
 FROM
   my_table t;
 
@@ -50,3 +50,13 @@ FROM
   ) AS CombinedResults
 ORDER BY
   timestamp DESC;
+
+SELECT
+  { p :PK }
+FROM
+  { Product AS p }
+WHERE
+  { p :code } LIKE '%myProduct'
+  OR { p :name } LIKE '%myProduct'
+ORDER BY
+  { p :code } ASC;

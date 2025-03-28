@@ -896,11 +896,11 @@ module.exports = grammar({
 
     term: ($) =>
       choice(
-        seq(
-          "{",
-          field("value", choice($.all_fields, $._expression)),
-          optional($._alias),
-          "}",
+        wrapped_in_braces(
+          seq(
+            field("value", choice($.all_fields, $._expression)),
+            optional($._alias),
+          ),
         ),
         seq(
           field("value", choice($.all_fields, $._expression)),
@@ -2848,18 +2848,7 @@ module.exports = grammar({
 
     relation: ($) =>
       prec.right(
-        choice(
-          seq(
-            "{",
-            choice(
-              $.subquery,
-              $.invocation,
-              $.object_reference,
-              wrapped_in_parenthesis($.values),
-            ),
-            optional(seq($._alias, optional(alias($._column_list, $.list)))),
-            "}",
-          ),
+        optional_bracess(
           seq(
             choice(
               $.subquery,
@@ -3129,10 +3118,7 @@ module.exports = grammar({
           prec.left(
             precedence,
             seq(
-              field(
-                "left",
-                choice(seq("{", $._expression, "}"), $._expression),
-              ),
+              optional_bracess(field("left", $._expression)),
               field("operator", operator),
               field("right", $._expression),
             ),
@@ -3145,10 +3131,7 @@ module.exports = grammar({
           prec.left(
             precedence,
             seq(
-              field(
-                "left",
-                choice(seq("{", $._expression, "}"), $._expression),
-              ),
+              optional_bracess(field("left", $._expression)),
               field("operator", operator),
               field("right", $._expression),
             ),
@@ -3161,10 +3144,7 @@ module.exports = grammar({
           prec.left(
             precedence,
             seq(
-              field(
-                "left",
-                choice(seq("{", $._expression, "}"), $._expression),
-              ),
+              optional_bracess(field("left", $._expression)),
               field("operator", operator),
               field("right", choice($.list, $.subquery)),
             ),
@@ -3292,6 +3272,17 @@ function wrapped_in_parenthesis(node) {
     return seq("(", node, ")");
   }
   return seq("(", ")");
+}
+
+function optional_bracess(node) {
+  return prec.right(choice(node, wrapped_in_braces(node)));
+}
+
+function wrapped_in_braces(node) {
+  if (node) {
+    return seq("{", node, "}");
+  }
+  return seq("{", "}");
 }
 
 function parametric_type($, type, params = ["size"]) {
